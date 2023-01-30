@@ -1,0 +1,51 @@
+import 'package:flutter/material.dart';
+import 'package:webview_flutter/webview_flutter.dart';
+import 'package:webview_flutter_android/webview_flutter_android.dart';
+import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
+
+void main() => runApp(const MaterialApp(home: DocViewer()));
+
+class DocViewer extends StatefulWidget {
+  const DocViewer({super.key});
+
+  @override
+  State<DocViewer> createState() => _DocViewerState();
+}
+
+class _DocViewerState extends State<DocViewer> {
+  late final WebViewController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    late final PlatformWebViewControllerCreationParams params;
+    if (WebViewPlatform.instance is WebKitWebViewPlatform) {
+      params = WebKitWebViewControllerCreationParams(
+        allowsInlineMediaPlayback: true,
+        mediaTypesRequiringUserAction: const <PlaybackMediaTypes>{},
+      );
+    } else {
+      params = const PlatformWebViewControllerCreationParams();
+    }
+
+    final WebViewController controller =
+        WebViewController.fromPlatformCreationParams(params);
+    // #enddocregion platform_features
+
+    controller.loadRequest(Uri.parse(
+        'https://docs.google.com/document/d/1Yf7F-pGViYv48kdlGiVeFxDOEhWC3kq1/edit?usp=drivesdk&ouid=109520051976138968590&rtpof=true&sd=true'));
+
+    _controller = controller;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Document Viewer'),
+      ),
+      body:
+          WebViewWidget(controller: _controller),
+    );
+  }
+}
